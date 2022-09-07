@@ -50,40 +50,6 @@ const createBlog = async function (req, res) {
 
 // --------------------------------------- GET /blogs --------------------------------------
 
-const getBlog= async function (req, res) {
-
-    try {
-
-        const data = req.query
-
-        //Validating data is empty or not
-        if (Object.keys(data).length == 0) {
-            const blog = await blogModel.find({ isPublished: true, isDeleted: false })
-            if (blog.length == 0) {
-                return res.status(404).send({ status: false, msg: "Blog doesn't Exists, field is required." })
-            }
-            res.status(200).send({ status: true, data: blog })
-
-        }
-
-        //get data by query param
-
-        if (Object.keys(data).length != 0) {
-            // data.isPublished = true
-            data.isDeleted = false
-            console.log(data)
-            let getBlog = await blogModel.find(data).populate("authorId")
-            if (getBlog.length == 0) {
-                return res.status(404).send({ status: false, msg: "No such blog exist, Please provide correct data." })
-            }
-            res.status(200).send({ status: true, data: getBlog })
-        }
-
-
-    } catch (error) {
-        res.status(500).send({ status: false, Error: error.message })
-    }
-}
 
 // --------------------------------------- PUT /blogs/:blogId --------------------------------------
 
@@ -188,36 +154,13 @@ const deleteQueryParams = async function (req, res) {
         }
     }
     
-//------------PHASE-2 ----------------------------------------------
-//-------------Login Author-----------------------------
 
-const loginAuthor=async function (req,res){
-    try{
-    let authorId=req.body.email
-    let password=req.body.password
-
-    let author=await authorModel.findOne({email:authorId,password:password })
-    if(!author){
-        res.status(404).send({msg:"Author not found"})
-    }
-
-    let token =jwt.sign({
-        Author:author._id.toString(),
-        msg:"Authors"
-    }, "this is my privet key")
-    res.status(201).send({status:true, msg:"your succsefully login this server",token})  
-}catch(err){
-    res.status(400).send({status:false,error:err.message})
-}
-}
 
 
 //-------------------------------- exporting Modules --------------------------------------------- 
 module.exports.getBlogs=getBlogs
 module.exports.createBlog = createBlog;
-module.exports.getBlog = getBlog
+
 module.exports.updateBlog = updateBlog
 module.exports.deleteBlog = deleteBlog
 module.exports.deleteQueryParams = deleteQueryParams
-//-----------------PHASE-2 MODULES----------------
-module.exports.loginAuthor=loginAuthor

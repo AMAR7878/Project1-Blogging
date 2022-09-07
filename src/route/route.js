@@ -13,7 +13,7 @@ router.post("/authors", author.createAuthor)
 //---------------------- CREATE and GET Blog using JWT ----------------------------------
 
 router.post("/blogs", blog.createBlog)
-router.get("/blogs", blog.getBlog)
+
 
 //---------------------- UPDATE Blog using JWT ------------------------------------------
 
@@ -28,5 +28,5 @@ router.delete("/blogs", blog.deleteQueryParams)
 router.post("/newGetBlog",blog.getBlogs)
 
 //--------PHASE-2 ROUTES--------------------
-router.post("/loginAuthor",blog.loginAuthor)
+router.post("/loginAuthor",author.loginAuthor)
 module.exports = router;

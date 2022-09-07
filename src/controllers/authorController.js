@@ -64,17 +64,30 @@ const createAuthor = async function (req, res) {
     }
   }
 
+  //-----login author----------------
+  const loginAuthor=async function (req,res){
+    try{
+    let authorId=req.body.email
+    let password=req.body.password
 
+    let author=await authorModel.findOne({email:authorId,password:password })
+    if(!author){
+        res.status(404).send({msg:"Author not found"})
+    }
 
-
-
-
-
-
-
-
-
+    let token =jwt.sign({
+        Author:author._id.toString(),
+        msg:"Authors"
+    }, "this is my privet key")
+    res.status(201).send({status:true, msg:"your succsefully login this server",token})  
+}catch(err){
+    res.status(400).send({status:false,error:err.message})
+}
+}
 
 
 
 module.exports.createAuthor = createAuthor;
+//-----------------PHASE-2 MODULES----------------
+module.exports.loginAuthor=loginAuthor
+
