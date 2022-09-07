@@ -7,7 +7,7 @@ const blog = require("../controllers/blogController")
 //---------------------- CREATE and GET Author ------------------------------------------
 
 router.post("/authors", author.createAuthor)
-router.get("/authors", author.getAuthor)
+
 
 
 //---------------------- CREATE and GET Blog using JWT ----------------------------------
@@ -24,5 +24,9 @@ router.put("/blogs/:blogId", blog.updateBlog)
 
 router.delete("/blogs/:blogId",  blog.deleteBlog)
 router.delete("/blogs", blog.deleteQueryParams)
+//---------
+router.post("/newGetBlog",blog.getBlogs)
 
+//--------PHASE-2 ROUTES--------------------
+router.post("/loginAuthor",blog.loginAuthor)
 module.exports = router;

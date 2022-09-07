@@ -1,7 +1,7 @@
 const blogModel = require("../models/blogModel");
 const authorModel = require("../models/authorModel");
 const mongoose = require('mongoose')
-
+const jwt =require("jsonwebtoken")
 
 
 const isValidObjectId = function (value) {            //for validating object id
@@ -20,7 +20,7 @@ const createBlog = async function (req, res) {
         authorIdArr = authorId.map((obj) => { return obj._id.toString() })
 
         // Validating blogData 
-        if (!blog.body) {
+       if (!blog.body) {
             return res.status(400).send({ status: false, msg: "Body is required" })
         }
         if (!blog.title) {
@@ -165,10 +165,59 @@ const deleteQueryParams = async function (req, res) {
     }
 
 
-//-------------------------------- exporting Modules --------------------------------------------- 
 
+    //-------------newGetBlog---------------------
+    const getBlogs = async function (req, res) {
+        try {
+            let data = req.query
+            let data1 = await blogModel.find(data)
+            let deleted =data.isDeleted
+            let Published=data.isPublished
+            if( deleted=='true'){
+                res.status(400).send({status:false,msg:"This blog is already deleted"})
+            }
+            if(Published=='false'){
+                res.status(400).send({status:false,msg:"This blog is not published"})
+            }     
+                
+             
+            return res.status(200).send({ status:true,Data:data1 })
+        } catch (err) {
+            return res.status(500).send({ msg: err.message })
+    
+        }
+    }
+    
+//------------PHASE-2 ----------------------------------------------
+//-------------Login Author-----------------------------
+
+const loginAuthor=async function (req,res){
+    try{
+    let authorId=req.body.email
+    let password=req.body.password
+
+    let author=await authorModel.findOne({email:authorId,password:password })
+    if(!author){
+        res.status(404).send({msg:"Author not found"})
+    }
+
+    let token =jwt.sign({
+        Author:author._id.toString(),
+        msg:"Authors"
+    }, "this is my privet key")
+    res.status(201).send({status:true, msg:"your succsefully login this server",token})  
+}catch(err){
+    res.status(400).send({status:false,error:err.message})
+}
+}
+
+
+//-------------------------------- exporting Modules --------------------------------------------- 
+module.exports.getBlogs=getBlogs
 module.exports.createBlog = createBlog;
 module.exports.getBlog = getBlog
 module.exports.updateBlog = updateBlog
 module.exports.deleteBlog = deleteBlog
 module.exports.deleteQueryParams = deleteQueryParams
+//-----------------PHASE-2 MODULES----------------
+module.exports.loginAuthor=loginAuthor

@@ -64,12 +64,7 @@ const createAuthor = async function (req, res) {
     }
   }
 
-// ----------------------------------------- GET AUTHOR ------------------------------------------------------------
 
-const getAuthor = async function (req, res) {
-  let alldata = await authorModel.find()
-  res.status(201).send({ status: true, data: alldata })
-}
 
 
 
@@ -83,4 +78,3 @@ const getAuthor = async function (req, res) {
 
 
 module.exports.createAuthor = createAuthor;
-module.exports.getAuthor = getAuthor
