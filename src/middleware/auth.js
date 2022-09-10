@@ -1,5 +1,4 @@
-const { query } = require("express");
-const jwt = require("jsonwebtoken");
+const jwt=require("jsonwebtoken");
 const authorModel = require("../models/authorModel");
 const blogModel = require("../models/blogModel");
 
@@ -8,23 +7,26 @@ const blogModel = require("../models/blogModel");
 
 const authentication = function (req, res, next) {
   try {
-    let token = req.headers["x-api-key"];
+    let token = req.headers["x-api-key"];         
+    
+    if (!token) return res.status(401).send({ status: false, msg: "token must be present" });    //If neither condition satisfies & no token is present in the request header return error
 
-    if (!token) return res.status(401).send({ status: false, msg: "token must be present" }); 
-    jwt.verify(token, "this is my privet key", function (error, decodedToken) {
-      if (error) {
-        return res.status(401).send({ status: false, msg: "Token is aa invalid." })
-      } else {
-        req.token = decodedToken
-        console.log(req.token)
-        next()
-      }
+  console.log(token); 
+  
+    let decodedToken = jwt.verify(token, "this is my privet key")
+    
+   if(!decodedToken) {
+      return res.status(401).send({ status: false, msg: "token is invalid" })}
+      req.token=decodedToken
+   
+      
+     
 
-    })
-
+     next()
+                         
 
   } catch (error) {
-    res.status(500).send({ status: false, Error: error.message })
+    return res.status(500).send({ status: false, Error: error.message })
   }
 };
 
@@ -34,41 +36,27 @@ const authentication = function (req, res, next) {
 const authorisation = async function (req, res, next) {
 
   try {
+    //  let token = req.headers["x-api-key"];
+    //  let authordata = jwt.verify(token, "this is my privet key");
     
     let blogID = req.params.blogId
-    let queryData = req.query
-
-
-    if (Object.keys(queryData).length !== 0) {
-
-      const queryBlog = await blogModel.findOne({ ...queryData })
-      if (!queryBlog) {
-        return res.status(404).send({ status: false, msg: 'Blog not found' })
-      }
-      console.log(queryBlog.authorId.toString())
-      console.log(req.token.authorId)
-      if (queryBlog.authorId.toString() !== req.token.authorId) {
-        return res.status(404).send({ status: false, msg: 'Permission Denied' })
-      }
-      return next()
-
-    }
-
     console.log(blogID)
-    let authId = req.token.authorId
+    let authId=req.token.authorId
 
-    let blog = await blogModel.findOne({ _id: blogID }).select({ authorId: 1 })
+    let blog = await blogModel.findOne({ _id: blogID }).select({authorId:1})
     console.log(blog)
-    if (authId == blog.authorId) 
+    console.log(authId)
+    if(authId==blog.authorId)    //id in blogModel is same as getting from req.params or not
     {
       next()
     }
-   
-    else { 
-      return res.status(403).send({ status: false, msg: 'Permission Denied' })
+    // console.log(blog)
+    // console.log(req.loggedInAuthorId)
+    else  {    //We have stored decoded token into req.loggedInAuthorId and comparing it with blog.authorId
+      return res.status(403).send({ status: false, msg: 'Permission denied' })
     }
 
-
+   
   } catch (err) {
     return res.status(500).send({ status: false, msg: err.message })
   }
@@ -78,9 +66,9 @@ const authorisation = async function (req, res, next) {
 
 
 
-//--------------------------------------/////------------------------------
-
-module.exports.authentication = authentication
-module.exports.authorisation = authorisation
-
+  //--------------------------------------/////------------------------------
+  
+  module.exports.authentication = authentication
+  module.exports.authorisation = authorisation
+  
 
