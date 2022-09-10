@@ -4,9 +4,7 @@ const objectId = mongoose.Schema.Types.ObjectId
 const blogSchema = new mongoose.Schema({
     title:{
         type:String,
-        required:true,
-        unique:true,
-        trim:true
+        required:true
     },
     body: {
         type: String,
@@ -38,12 +36,8 @@ const blogSchema = new mongoose.Schema({
         default: false
     },
 
-    deletedAt: {type: Date, 
-        default: Date.now},
-
-    publishedAt: {type: Date, 
-        default: Date.now}
-
+    deletedAt: Date,
+    publishedAt: Date
 },
     { timestamps: true });
 
