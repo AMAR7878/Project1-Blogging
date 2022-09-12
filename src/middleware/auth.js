@@ -1,5 +1,7 @@
-const jwt=require("jsonwebtoken");
-const authorModel = require("../models/authorModel");
+//const { query } = require("express");
+const jwt = require("jsonwebtoken");
+//const authorModel = require("../models/authorModel");
+
 const blogModel = require("../models/blogModel");
 
 
@@ -7,9 +9,24 @@ const blogModel = require("../models/blogModel");
 
 const authentication = function (req, res, next) {
   try {
+
+    let token = req.headers["x-api-key"];
+
+    if (!token) return res.status(401).send({ status: false, msg: "token must be present" }); 
+    jwt.verify(token, "this is my privet key", function (error, decodedToken) {
+      if (error) {
+        return res.status(401).send({ status: false, msg: "Token is aa invalid." })
+      } else {
+        req.token = decodedToken
+        
+        
+        next()
+      }
+
     let token = req.headers["x-api-key"];         
     
     if (!token) return res.status(401).send({ status: false, msg: "token must be present" });    //If neither condition satisfies & no token is present in the request header return error
+
 
   console.log(token); 
   
@@ -40,6 +57,32 @@ const authorisation = async function (req, res, next) {
     //  let authordata = jwt.verify(token, "this is my privet key");
     
     let blogID = req.params.blogId
+    let queryData = req.query
+    if (Object.keys(queryData).length !== 0) {
+
+      const queryBlog = await blogModel.findOne({authorId:req.token.authorId, ...queryData })
+      if (!queryBlog) {
+        return res.status(404).send({ status: false, msg: 'Blog not found' })
+      }
+      
+      if (queryBlog.authorId.toString() !== req.token.authorId) {
+        return res.status(404).send({ status: false, msg: 'Permission Denied' })
+      }
+      return next()
+
+    }
+    let authId = req.token.authorId
+
+    let blog = await blogModel.findOne({ _id: blogID }).select({ authorId: 1 })
+    //console.log(blog)
+    if (authId == blog.authorId) 
+    {
+      next()
+    }
+   
+    else { 
+      return res.status(403).send({ status: false, msg: 'Permission Not accept' })
+
     console.log(blogID)
     let authId=req.token.authorId
 
@@ -54,6 +97,7 @@ const authorisation = async function (req, res, next) {
     // console.log(req.loggedInAuthorId)
     else  {    //We have stored decoded token into req.loggedInAuthorId and comparing it with blog.authorId
       return res.status(403).send({ status: false, msg: 'Permission denied' })
+
     }
 
    

@@ -41,7 +41,7 @@ const createAuthor = async function (req, res) {
         return res.status(400).send({ status: false, msg: "title is required" })
       }
       if (["Mr", "Mrs", "Miss"].indexOf(author_data.title) == -1) {
-        return res.status(400).send({ status: false, msg: "Invalid title, Please select from Mr, Mrs, Miss" })// enum checked
+        return res.status(400).send({ status: false, msg: "Invalid title, Please select from Mr, Mrs, Miss" })
       }
       if (!author_data.email) {
         return res.status(400).send({ status: false, msg: "email is required" })
