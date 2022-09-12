@@ -6,6 +6,7 @@ const blogSchema = new mongoose.Schema({
         type:String,
         required:true,
         trim:true
+
     },
     body: {
         type: String,
@@ -37,12 +38,8 @@ const blogSchema = new mongoose.Schema({
         default: false
     },
 
-    deletedAt: {type: Date, 
-        default: Date.now},
-
-    publishedAt: {type: Date, 
-        default: Date.now}
-
+    deletedAt: Date,
+    publishedAt: Date
 },
     { timestamps: true });
 
